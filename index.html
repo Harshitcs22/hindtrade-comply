@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HindTrade Comply | The Border Has Changed</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        background: '#050505',
+                        surface: '#0A0A0A',
+                        border: '#27272a',
+                        primary: '#10b981',
+                        textMain: '#E5E5E5',
+                        textMuted: '#737373',
+                    },
+                    letterSpacing: {
+                        tight: '-0.025em',
+                        tighter: '-0.04em',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { 
+            background-color: #050505; 
+            color: #E5E5E5;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .hero-mesh {
+            background-image:
+                radial-gradient(at 50% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(255, 255, 255, 0.03) 0px, transparent 50%);
+        }
+
+        /* --- SPOTLIGHT EFFECT CSS --- */
+        .spotlight-card {
+            position: relative;
+            overflow: hidden;
+            /* Keeps the original background colors but allows the glow overlay */
+        }
+        
+        .spotlight-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(
+                800px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
+                rgba(255, 255, 255, 0.06),
+                transparent 40%
+            );
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .spotlight-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Ensure content sits above the glow */
+        .spotlight-card > * {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body class="selection:bg-primary/30 selection:text-white">
+
+    <nav class="fixed w-full z-50 border-b border-white/5 bg-[#050505]/80 backdrop-blur-md">
+        <div class="max-w-5xl mx-auto px-6 h-16 flex justify-between items-center">
+            <div class="flex items-center font-medium tracking-tight text-sm text-white group cursor-pointer">
+                HindTrade <span class="text-textMuted ml-1 group-hover:text-primary transition-colors">Comply</span>
+            </div>
+            <div class="flex items-center gap-6 text-xs font-medium text-textMuted">
+                <a href="https://hindtradeai.vercel.app/" target="_blank" class="hover:text-white transition">
+                    Parent Company
+                </a>
+                <button class="text-white px-3 py-1.5 rounded bg-white/10 hover:bg-white/15 transition border border-white/10">
+                    Sign In
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="relative pt-32 pb-20 hero-mesh">
+        <div class="max-w-3xl mx-auto px-6 text-center">
+            
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-400/40 bg-emerald-500/10 text-emerald-300 text-[11px] font-medium mb-8 tracking-[0.16em] uppercase">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.9)]"></span>
+                CBAM 2026 • Action Required for EU Shipments
+            </div>
+
+            <h1 class="text-4xl md:text-6xl font-medium tracking-tighter text-white mb-6 leading-[1.1]">
+                The border has changed.<br>
+                <span class="text-textMuted">Your paperwork hasn't.</span>
+            </h1>
+
+            <p class="text-lg text-textMuted mb-10 max-w-xl mx-auto font-light leading-relaxed">
+                European Customs now want transparent, ISO 14067–aligned carbon math, not just invoices. <strong>HindTrade Comply</strong> pairs a calculation engine with a live Auditor Network so your containers don’t get stuck at EU borders.
+            </p>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button class="bg-white text-black font-medium px-8 py-3 rounded hover:bg-gray-200 transition text-sm">
+                    Generate CBAM Report
+                </button>
+                <button class="text-textMuted hover:text-white font-medium px-8 py-3 transition text-sm flex items-center justify-center">
+                    View Sample Certificate <i data-lucide="arrow-right" class="w-4 h-4 ml-2 opacity-50"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 border-y border-white/5 bg-[#060606]">
+        <div class="max-w-4xl mx-auto px-6">
+            <h2 class="text-lg font-medium text-white mb-3">Why CBAM is suddenly non‑negotiable</h2>
+            <p class="text-xs text-textMuted leading-relaxed mb-3">
+                From 1 January 2026, the EU’s Carbon Border Adjustment Mechanism (CBAM) moves into its definitive phase: importers of iron & steel, aluminium, cement, fertilisers, hydrogen and electricity must be authorised CBAM declarants, report embedded emissions, and surrender CBAM certificates for goods placed on the EU market.
+                <sup>
+                    <a href="https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism_en" target="_blank" class="underline decoration-white/20 hover:decoration-primary">
+                        EU official CBAM page
+                    </a>
+                </sup>
+            </p>
+            <p class="text-xs text-textMuted leading-relaxed">
+                The UK has also confirmed it will introduce its own CBAM from 2027, with draft primary legislation already under consultation and sector‑specific CBAM rates to be published ahead of go‑live.
+                <sup>
+                    <a href="https://www.gov.uk/government/publications/factsheet-carbon-border-adjustment-mechanism-cbam/factsheet-carbon-border-adjustment-mechanism" target="_blank" class="underline decoration-white/20 hover:decoration-primary">
+                        UK Government factsheet
+                    </a>
+                </sup>
+            </p>
+        </div>
+    </section>
+
+    <section class="py-16 border-b border-white/5 bg-[#050505]">
+        <div class="max-w-4xl mx-auto px-6">
+            <h2 class="text-lg font-medium text-white mb-4">TARIC is getting opinionated about your carbon data</h2>
+            <p class="text-xs text-textMuted leading-relaxed mb-4">
+                The European Commission has already updated the TARIC customs system to integrate CBAM codes ahead of full implementation in 2026 — including hard conditions that decide whether CBAM goods are even allowed to clear EU customs.
+                <sup>
+                    <a href="https://www.steelorbis.com/steel-news/latest-news/eu-updates-taric-system-to-integrate-cbam-ahead-of-full-implementation-in-2026-1423774.htm" target="_blank" class="underline decoration-white/20 hover:decoration-primary">
+                        SteelOrbis summary
+                    </a>
+                </sup>
+            </p>
+
+            <div class="grid md:grid-cols-3 gap-6 text-[11px] text-textMuted">
+                <div class="spotlight-card p-4 rounded border border-white/10 bg-[#080808]">
+                    <div class="text-red-400 font-semibold mb-1 text-[10px] tracking-[0.14em] uppercase">
+                        Y060 • Block Condition
+                    </div>
+                    <p class="leading-relaxed">
+                        If none of the required CBAM certificates apply, TARIC condition Y060 blocks the importation of CBAM goods. In plain English: the system itself can stop your steel, aluminium or cement at the border if the data and documentation are not in order.
+                    </p>
+                </div>
+                <div class="spotlight-card p-4 rounded border border-white/10 bg-[#080808]">
+                    <div class="text-emerald-400 font-semibold mb-1 text-[10px] tracking-[0.14em] uppercase">
+                        Y128 • Standard Clearance
+                    </div>
+                    <p class="leading-relaxed">
+                        Certificate Y128 records the CBAM account number of the authorised declarant and is the basis for “normal” CBAM imports. <strong>HindTrade Comply</strong> focuses on generating the ISO 14067‑style data pack your EU buyer needs to support their Y128 filings.
+                    </p>
+                </div>
+                <div class="spotlight-card p-4 rounded border border-white/10 bg-[#080808]">
+                    <div class="text-amber-300 font-semibold mb-1 text-[10px] tracking-[0.14em] uppercase">
+                        Y238 • Application Pending
+                    </div>
+                    <p class="leading-relaxed">
+                        For buyers whose CBAM declarant status is still under review, certificate Y238 allows temporary clearance while the application is processed. Having clean, auditable carbon data from day one makes it much easier for them to keep using Y238 without interruptions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 border-y border-white/5 bg-[#080808]">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="grid md:grid-cols-[1fr_2fr] gap-12">
+                
+                <div>
+                    <h2 class="text-xl font-medium text-white mb-2">Our Heritage</h2>
+                    <div class="h-0.5 w-12 bg-primary/50 mb-4"></div>
+                    <p class="text-sm text-textMuted">
+                        From the team behind 
+                        <a href="https://hindtradeai.vercel.app/" target="_blank" class="text-white underline decoration-white/20 hover:decoration-primary underline-offset-4">
+                            HindTrade AI
+                        </a>.
+                    </p>
+                </div>
+
+                <div class="space-y-6 text-sm leading-7 text-gray-400 font-light">
+                    <p>
+                        We didn't just wake up and decide to build a calculator. We are building the <strong class="text-white font-medium">Agent-Led Trade Network</strong>.
+                    </p>
+                    <p>
+                        At HindTrade, we believe <em>Code is Law</em> and <em>Trust is Currency</em>. We have already deployed 7 AI Agents that automate the export journey—from buyer discovery to CA verification. We know the domain because we live in it.
+                    </p>
+                    <p>
+                        When the CBAM 2026 regulations were announced, we saw Indian exporters panicking. Consultants were charging ₹50k for a spreadsheet.
+                    </p>
+                    <p>
+                        So we took our <strong>Trade Card technology</strong> (QR backed by CA audits) and recalibrated it for Carbon. Everything verified, nothing manual.
+                    </p>
+                    
+                    <div class="pt-4">
+                        <a href="https://hindtradeai.vercel.app/" target="_blank" class="inline-flex items-center text-primary hover:text-emerald-300 transition text-sm font-medium">
+                            Explore the HindTrade OS <i data-lucide="arrow-up-right" class="w-4 h-4 ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 max-w-5xl mx-auto px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-2xl font-medium text-white tracking-tight">How we solve liability</h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="spotlight-card p-6 rounded border border-white/5 bg-surface/50">
+                <div class="text-primary mb-4"><i data-lucide="file-up" class="w-6 h-6"></i></div>
+                <h3 class="text-white font-medium mb-2 text-sm">1. Evidence Upload</h3>
+                <p class="text-textMuted text-xs leading-relaxed">
+                    You upload raw bills (Electricity & Diesel). We don't take your word for it; we take the source document.
+                </p>
+            </div>
+
+            <div class="spotlight-card p-6 rounded border border-white/5 bg-surface/50">
+                <div class="text-primary mb-4"><i data-lucide="cpu" class="w-6 h-6"></i></div>
+                <h3 class="text-white font-medium mb-2 text-sm">2. ISO 14067 Engine</h3>
+                <p class="text-textMuted text-xs leading-relaxed">
+                    Our system maps your consumption to the Indian Grid Emission Factor band (around 0.7 kgCO₂/kWh based on latest public data) automatically, and applies ISO 14067 methodology on top.
+                </p>
+            </div>
+
+            <div class="spotlight-card p-6 rounded border border-primary/20 bg-primary/5">
+                <div class="text-primary mb-4"><i data-lucide="pen-tool" class="w-6 h-6"></i></div>
+                <h3 class="text-white font-medium mb-2 text-sm">3. Auditor Sign-off</h3>
+                <p class="text-textMuted text-xs leading-relaxed">
+                    A BEE Certified Energy Auditor reviews the calc and digitally signs it (DSC). This makes it a legal, banking‑grade document.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 border-t border-white/5">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                
+                <div class="p-8">
+                    <div class="text-lg font-medium text-white mb-2">Self Declaration</div>
+                    <div class="text-3xl font-medium text-white mb-6">₹999</div>
+                    <p class="text-xs text-textMuted mb-8 leading-relaxed">
+                        Best for internal audits or non‑EU buyers who just want to see green initiatives. Signed by you, backed by our engine.
+                    </p>
+                    <button class="w-full py-3 rounded border border-white/20 text-white text-sm hover:bg-white/5 transition">
+                        Select Standard
+                    </button>
+                </div>
+
+                <div class="spotlight-card p-8 rounded bg-[#0F0F0F] border border-white/10 shadow-2xl relative">
+                     <div class="absolute top-0 right-0 bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 uppercase tracking-wider z-20">
+                        Suggested for EU
+                    </div>
+                    <div class="text-lg font-medium text-white mb-2">Auditor Verified</div>
+                    <div class="text-3xl font-medium text-white mb-6">₹2,999</div>
+                    <p class="text-xs text-textMuted mb-8 leading-relaxed">
+                        Includes valid Digital Signature (DSC) from a BEE Certified Energy Auditor. This is what your buyer needs when they file CBAM declarations linked to TARIC certificates like Y128.
+                    </p>
+                    <button class="w-full py-3 rounded bg-white text-black font-medium text-sm hover:bg-gray-200 transition">
+                        Get Verified Certificate
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 max-w-3xl mx-auto px-6 border-t border-white/5">
+        <h2 class="text-xl font-medium text-white mb-10">Technical Analysis</h2>
+        
+        <div class="space-y-1">
+            <details class="group open:bg-white/5 rounded transition-all">
+                <summary class="flex justify-between items-center p-4 cursor-pointer text-sm text-gray-300 hover:text-white">
+                    Does this meet the "Verification" criteria for EU CBAM?
+                    <i data-lucide="plus" class="w-4 h-4 text-textMuted group-open:hidden"></i>
+                    <i data-lucide="minus" class="w-4 h-4 text-textMuted hidden group-open:block"></i>
+                </summary>
+                <div class="px-4 pb-4 text-textMuted text-xs leading-relaxed">
+                    Yes. The EU regulation explicitly asks for the methodology to follow ISO 14067‑style product carbon footprinting. Our Gold tier adds the "Third Party Verification" layer by attaching the Digital Signature of a Government Authorized Auditor (BEE), which removes the conflict of interest inherent in self‑declarations.
+                </div>
+            </details>
+
+            <details class="group open:bg-white/5 rounded transition-all">
+                <summary class="flex justify-between items-center p-4 cursor-pointer text-sm text-gray-300 hover:text-white">
+                    How is the "Embedded Emission" calculated?
+                    <i data-lucide="plus" class="w-4 h-4 text-textMuted group-open:hidden"></i>
+                    <i data-lucide="minus" class="w-4 h-4 text-textMuted hidden group-open:block"></i>
+                </summary>
+                <div class="px-4 pb-4 text-textMuted text-xs leading-relaxed">
+                    We use the formula: <em>(Electricity kWh × Grid Factor) + (Fuel L × Emission Factor) / Total Production Kg</em>. The Grid Factor is pulled from the latest Indian power‑mix data, and fuel factors are based on standard references, so your report is both explainable and updatable as regulations evolve.
+                </div>
+            </details>
+
+            <details class="group open:bg-white/5 rounded transition-all">
+                <summary class="flex justify-between items-center p-4 cursor-pointer text-sm text-gray-300 hover:text-white">
+                    What happens if I use the ₹999 plan for EU Exports?
+                    <i data-lucide="plus" class="w-4 h-4 text-textMuted group-open:hidden"></i>
+                    <i data-lucide="minus" class="w-4 h-4 text-textMuted hidden group-open:block"></i>
+                </summary>
+                <div class="px-4 pb-4 text-textMuted text-xs leading-relaxed">
+                    You risk rejection at the border. The ₹999 plan is a "Self Declaration". While the math is correct, it lacks the independent authority's signature. If a Customs Officer flags your shipment for audit — especially under TARIC condition Y060 — a self‑declaration is often insufficient proof of due diligence.
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <footer class="py-12 text-center border-t border-white/5">
+        <div class="text-xs text-textMuted mb-2">
+            Founded and architected by <span class="text-white font-medium hover:text-primary transition-colors cursor-default">Harshit Choudhary</span>, NITJ CSE.
+        </div>
+        <div class="text-[10px] text-gray-600">
+            Estonia • Powered by <span class="text-white">HindTrade AI</span>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        const cards = document.querySelectorAll('.spotlight-card');
+        
+        cards.forEach(card => {
+            card.onmousemove = e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            }
+        });
+    </script>
+</body>
+</html>
