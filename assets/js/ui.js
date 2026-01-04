@@ -11,13 +11,25 @@ let currentUser = null;
 
 /**
  * Initialize authentication state on page load
+ * Uses the new checkSession() method for proper session persistence
  */
 export async function initAuth() {
-    const { data: user, error } = await auth.getUser();
-    if (user && !error) {
-        currentUser = user;
+    console.log('🔍 Initializing auth state...');
+    const session = await auth.checkSession();
+    if (session) {
+        currentUser = session.user;
         updateAuthButton(true);
+        console.log('✅ User authenticated:', session.user?.email);
+    } else {
+        console.log('📌 No authenticated user');
     }
+    
+    // Listen for auth state changes
+    window.addEventListener('authStateChange', (event) => {
+        const { user, session } = event.detail;
+        currentUser = user;
+        updateAuthButton(!!session);
+    });
 }
 
 /**
@@ -26,12 +38,17 @@ export async function initAuth() {
  */
 function updateAuthButton(isLoggedIn) {
     const authBtn = document.getElementById('authBtn');
+    if (!authBtn) return;
+    
     if (isLoggedIn) {
-        authBtn.textContent = 'Logout';
-        authBtn.onclick = handleLogout;
+        authBtn.textContent = 'Dashboard';
+        authBtn.href = '/dashboard.html';
+        // Remove onclick handler if it exists
+        authBtn.onclick = null;
     } else {
         authBtn.textContent = 'Login';
-        authBtn.onclick = openAuthModal;
+        authBtn.href = '/login.html';
+        authBtn.onclick = null;
     }
 }
 
@@ -57,7 +74,8 @@ export function closeAuthModal() {
 }
 
 /**
- * Handle user login
+ * Handle user login (modal flow - legacy)
+ * Redirects to dashboard after successful login
  */
 export async function handleLogin(e) {
     e.preventDefault();
@@ -79,25 +97,35 @@ export async function handleLogin(e) {
     
     const { data, error } = await auth.signIn(email, password);
     
-    loginBtn.textContent = originalText;
-    loginBtn.disabled = false;
-    
     if (error) {
+        loginBtn.textContent = originalText;
+        loginBtn.disabled = false;
         errorDiv.textContent = error.message || 'Login failed. Please check your credentials.';
         errorDiv.classList.remove('hidden');
     } else {
         currentUser = data.user;
-        successDiv.textContent = 'Login successful!';
+        successDiv.textContent = 'Login successful! Redirecting...';
         successDiv.classList.remove('hidden');
-        updateAuthButton(true);
-        setTimeout(() => {
-            closeAuthModal();
-        }, 1000);
+        
+        // Verify session and redirect to dashboard
+        const session = await auth.checkSession();
+        if (session) {
+            setTimeout(() => {
+                window.location.href = '/dashboard.html';
+            }, 500);
+        } else {
+            loginBtn.textContent = originalText;
+            loginBtn.disabled = false;
+            errorDiv.textContent = 'Session could not be verified. Please try again.';
+            errorDiv.classList.remove('hidden');
+            successDiv.classList.add('hidden');
+        }
     }
 }
 
 /**
- * Handle user signup
+ * Handle user signup (modal flow - legacy)
+ * Redirects to login page after successful signup
  */
 export async function handleSignup() {
     const email = document.getElementById('authEmail').value;
@@ -137,14 +165,25 @@ export async function handleSignup() {
         errorDiv.textContent = error.message || 'Signup failed. Please try again.';
         errorDiv.classList.remove('hidden');
     } else {
-        successDiv.textContent = 'Account created! Please check your email to verify.';
-        successDiv.classList.remove('hidden');
-        // Auto-login after signup
-        if (data.user) {
-            currentUser = data.user;
-            updateAuthButton(true);
+        // Check if email confirmation is required
+        if (data.user && !data.session) {
+            successDiv.textContent = 'Account created! Please check your email to verify, then login.';
+            successDiv.classList.remove('hidden');
             setTimeout(() => {
-                closeAuthModal();
+                window.location.href = '/login.html';
+            }, 3000);
+        } else if (data.session) {
+            // Auto-login successful
+            successDiv.textContent = 'Account created! Redirecting to dashboard...';
+            successDiv.classList.remove('hidden');
+            setTimeout(() => {
+                window.location.href = '/dashboard.html';
+            }, 1000);
+        } else {
+            successDiv.textContent = 'Account created! Please login to continue.';
+            successDiv.classList.remove('hidden');
+            setTimeout(() => {
+                window.location.href = '/login.html';
             }, 2000);
         }
     }
@@ -152,13 +191,16 @@ export async function handleSignup() {
 
 /**
  * Handle user logout
+ * Redirects to login page after successful logout
  */
 export async function handleLogout() {
     const { error } = await auth.signOut();
     if (!error) {
         currentUser = null;
-        updateAuthButton(false);
-        alert('Logged out successfully');
+        window.location.href = '/login.html';
+    } else {
+        console.error('Logout error:', error.message);
+        alert('Logout failed. Please try again.');
     }
 }
 
@@ -167,11 +209,13 @@ export async function handleLogout() {
  */
 export async function handleDownload(calculationData) {
     // Step 1: Check if user is logged in
-    if (!currentUser) {
+    const session = await auth.checkSession();
+    if (!session) {
         alert('Please login to save and download your report');
-        openAuthModal();
+        window.location.href = '/login.html';
         return;
     }
+    currentUser = session.user;
     
     const downloadBtn = document.getElementById('downloadPDFBtn');
     const originalText = downloadBtn.textContent;
