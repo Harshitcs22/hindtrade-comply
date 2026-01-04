@@ -292,8 +292,8 @@ export async function handleSignup() {
         return;
     }
 
-    if (password.length < 6) {
-        showAuthError('Password must be at least 6 characters');
+    if (password.length < 12) {
+        showAuthError('Password must be at least 12 characters');
         return;
     }
 

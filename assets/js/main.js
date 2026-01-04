@@ -22,113 +22,140 @@ import {
 } from './ui.js';
 import { calculationResults } from './config.js';
 
-// Initialize Lucide icons
-if (window.lucide) {
-    window.lucide.createIcons();
-}
+/**
+ * Setup authentication event listeners
+ */
+function setupAuthListeners() {
+    // Auth Modal Controls
+    const authBtn = document.getElementById('authBtn');
+    const closeAuthBtn = document.getElementById('closeAuthBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const signUpNavBtn = document.getElementById('signUpNavBtn');
 
-// Initialize authentication on page load
-initAuth();
-
-// Spotlight effect for cards
-const cards = document.querySelectorAll('.spotlight-card');
-cards.forEach(card => {
-    card.onmousemove = e => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        card.style.setProperty('--mouse-x', `${x}px`);
-        card.style.setProperty('--mouse-y', `${y}px`);
+    if (authBtn) {
+        authBtn.addEventListener('click', handleAuthButtonClick);
     }
-});
 
-// Expose functions to window for HTML onclick handlers
-window.openCalculator = openCalculator;
-window.closeCalculator = closeCalculator;
-window.togglePrecursorSection = togglePrecursorSection;
-window.addPrecursorRow = addPrecursorRow;
-window.saveState = saveState;
-window.calculate = calculate;
-window.generatePDF = generatePDF;
-window.generateXML = generateXML;
+    if (signUpNavBtn) {
+        signUpNavBtn.addEventListener('click', () => openAuthModal('signup'));
+    }
 
-// Modal Controls
-const openBtn = document.getElementById('openCalculatorBtn');
-const closeBtn = document.getElementById('closeCalculatorBtn');
+    if (closeAuthBtn) {
+        closeAuthBtn.addEventListener('click', closeAuthModal);
+    }
 
-if (openBtn) {
-    openBtn.addEventListener('click', openCalculator);
+    if (loginBtn) {
+        loginBtn.addEventListener('click', handleLogin);
+    }
+
+    if (signupBtn) {
+        signupBtn.addEventListener('click', handleSignup);
+    }
 }
 
-if (closeBtn) {
-    closeBtn.addEventListener('click', closeCalculator);
-}
+/**
+ * Setup calculator event listeners
+ */
+function setupCalculatorListeners() {
+    // Modal Controls
+    const openBtn = document.getElementById('openCalculatorBtn');
+    const closeBtn = document.getElementById('closeCalculatorBtn');
 
-// Auth Modal Controls
-const authBtn = document.getElementById('authBtn');
-const closeAuthBtn = document.getElementById('closeAuthBtn');
-const loginBtn = document.getElementById('loginBtn');
-const signupBtn = document.getElementById('signupBtn');
-const signUpNavBtn = document.getElementById('signUpNavBtn');
+    if (openBtn) {
+        openBtn.addEventListener('click', openCalculator);
+    }
 
-if (authBtn) {
-    authBtn.addEventListener('click', handleAuthButtonClick);
-}
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeCalculator);
+    }
 
-if (signUpNavBtn) {
-    signUpNavBtn.addEventListener('click', () => openAuthModal('signup'));
-}
+    // CN Code Validation
+    const cnCodeInput = document.getElementById('cnCode');
+    if (cnCodeInput) {
+        cnCodeInput.addEventListener('input', (e) => {
+            validateCNCode(e.target.value);
+            saveState();
+        });
+    }
 
-if (closeAuthBtn) {
-    closeAuthBtn.addEventListener('click', closeAuthModal);
-}
+    // Precursor Toggle
+    const precursorToggle = document.getElementById('precursorToggle');
+    if (precursorToggle) {
+        precursorToggle.addEventListener('click', togglePrecursorSection);
+    }
 
-if (loginBtn) {
-    loginBtn.addEventListener('click', handleLogin);
-}
+    // Add Precursor Button
+    const addPrecursorBtn = document.getElementById('addPrecursorBtn');
+    if (addPrecursorBtn) {
+        addPrecursorBtn.addEventListener('click', addPrecursorRow);
+    }
 
-if (signupBtn) {
-    signupBtn.addEventListener('click', handleSignup);
-}
+    // Calculate Button
+    const calculateBtn = document.getElementById('calculateBtn');
+    if (calculateBtn) {
+        calculateBtn.addEventListener('click', calculate);
+    }
 
-// CN Code Validation
-const cnCodeInput = document.getElementById('cnCode');
-if (cnCodeInput) {
-    cnCodeInput.addEventListener('input', (e) => {
-        validateCNCode(e.target.value);
-        saveState();
+    // PDF Download Button
+    const downloadPDFBtn = document.getElementById('downloadPDFBtn');
+    if (downloadPDFBtn) {
+        downloadPDFBtn.addEventListener('click', handleDownload);
+    }
+
+    // XML Download Button
+    const downloadXMLBtn = document.getElementById('downloadXMLBtn');
+    if (downloadXMLBtn) {
+        downloadXMLBtn.addEventListener('click', generateXML);
+    }
+
+    // Auto-save on input changes
+    ['productionQty', 'electricity', 'diesel', 'coal'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', saveState);
+        }
     });
 }
 
-// Precursor Toggle
-const precursorToggle = document.getElementById('precursorToggle');
-if (precursorToggle) {
-    precursorToggle.addEventListener('click', togglePrecursorSection);
-}
+/**
+ * Initialize application when DOM is ready
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Lucide icons
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
 
-// Add Precursor Button
-const addPrecursorBtn = document.getElementById('addPrecursorBtn');
-if (addPrecursorBtn) {
-    addPrecursorBtn.addEventListener('click', addPrecursorRow);
-}
+    // Initialize authentication on page load
+    initAuth();
 
-// Calculate Button
-const calculateBtn = document.getElementById('calculateBtn');
-if (calculateBtn) {
-    calculateBtn.addEventListener('click', calculate);
-}
+    // Setup all event listeners
+    setupAuthListeners();
+    setupCalculatorListeners();
 
-// PDF Download Button
-const downloadPDFBtn = document.getElementById('downloadPDFBtn');
-if (downloadPDFBtn) {
-    downloadPDFBtn.addEventListener('click', handleDownload);
-}
+    // Spotlight effect for cards
+    const cards = document.querySelectorAll('.spotlight-card');
+    cards.forEach(card => {
+        card.onmousemove = e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+        }
+    });
+
+    console.log('CBAM Calculator initialized successfully');
+});
 
 /**
  * Handle download - Save to Supabase first, then generate PDF with UUID
  */
 async function handleDownload() {
+    const downloadPDFBtn = document.getElementById('downloadPDFBtn');
+    
     // Step 1: Check if user is logged in
     if (!isUserLoggedIn()) {
         alert('Please login to save and download your report');
@@ -222,19 +249,3 @@ function getPrecursorsData() {
     });
     return precursors;
 }
-
-// XML Download Button
-const downloadXMLBtn = document.getElementById('downloadXMLBtn');
-if (downloadXMLBtn) {
-    downloadXMLBtn.addEventListener('click', generateXML);
-}
-
-// Auto-save on input changes
-['productionQty', 'electricity', 'diesel', 'coal'].forEach(id => {
-    const element = document.getElementById(id);
-    if (element) {
-        element.addEventListener('input', saveState);
-    }
-});
-
-console.log('CBAM Calculator initialized successfully');
