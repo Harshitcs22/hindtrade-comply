@@ -57,7 +57,7 @@
                 <a href="https://hindtradeai.vercel.app/" target="_blank" class="hover:text-white transition">
                     Parent Company
                 </a>
-                <button id="authBtn" class="text-white px-3 py-1.5 rounded bg-white/10 hover:bg-white/15 transition border border-white/10">
+                <button id="authBtn" onclick="document.getElementById('authModal').classList.remove('hidden')" class="text-white px-3 py-1.5 rounded bg-white/10 hover:bg-white/15 transition border border-white/10">
                     Login
                 </button>
             </div>
@@ -482,7 +482,7 @@
         <div class="h-full flex items-center justify-center p-6">
             <div class="w-full max-w-md p-8 rounded-lg border border-white/10 bg-[#0A0A0A]/95 backdrop-blur-md relative">
                 <!-- Close Button -->
-                <button id="closeAuthBtn" class="absolute top-4 right-4 text-textMuted hover:text-white transition">
+                <button id="closeAuthBtn" onclick="document.getElementById('authModal').classList.add('hidden')" class="absolute top-4 right-4 text-textMuted hover:text-white transition">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
 
