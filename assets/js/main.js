@@ -5,7 +5,23 @@
 
 import { validateCNCode, calculate } from './calculator.js';
 import { generatePDF, generateXML } from './export.js';
-import { openCalculator, closeCalculator, togglePrecursorSection, addPrecursorRow, saveState } from './ui.js';
+import { 
+    openCalculator, 
+    closeCalculator, 
+    togglePrecursorSection, 
+    addPrecursorRow, 
+    saveState,
+    initAuth,
+    openAuthModal,
+    closeAuthModal,
+    handleLogin,
+    handleSignup,
+    handleDownload
+} from './ui.js';
+import { calculationResults } from './config.js';
+
+// Initialize authentication on page load
+initAuth();
 
 // Initialize Lucide icons
 if (window.lucide) {
@@ -47,6 +63,23 @@ if (closeBtn) {
     closeBtn.addEventListener('click', closeCalculator);
 }
 
+// Auth Modal Controls
+const closeAuthBtn = document.getElementById('closeAuthBtn');
+if (closeAuthBtn) {
+    closeAuthBtn.addEventListener('click', closeAuthModal);
+}
+
+// Auth Form
+const authForm = document.getElementById('authForm');
+if (authForm) {
+    authForm.addEventListener('submit', handleLogin);
+}
+
+const signupBtn = document.getElementById('signupBtn');
+if (signupBtn) {
+    signupBtn.addEventListener('click', handleSignup);
+}
+
 // CN Code Validation
 const cnCodeInput = document.getElementById('cnCode');
 if (cnCodeInput) {
@@ -74,10 +107,35 @@ if (calculateBtn) {
     calculateBtn.addEventListener('click', calculate);
 }
 
-// PDF Download Button
+// PDF Download Button - Updated to use new flow
 const downloadPDFBtn = document.getElementById('downloadPDFBtn');
 if (downloadPDFBtn) {
-    downloadPDFBtn.addEventListener('click', generatePDF);
+    downloadPDFBtn.addEventListener('click', () => {
+        if (calculationResults) {
+            // Get all input data for saving
+            const inputData = {
+                ...calculationResults,
+                electricity: parseFloat(document.getElementById('electricity').value) || 0,
+                diesel: parseFloat(document.getElementById('diesel').value) || 0,
+                coal: parseFloat(document.getElementById('coal').value) || 0,
+                precursors: []
+            };
+            
+            // Collect precursor data
+            const precursorItems = document.querySelectorAll('#precursorList > div');
+            precursorItems.forEach(item => {
+                const type = item.querySelector('.precursor-type').value;
+                const qty = parseFloat(item.querySelector('.precursor-qty').value) || 0;
+                if (type && qty > 0) {
+                    inputData.precursors.push({ type, qty });
+                }
+            });
+            
+            handleDownload(inputData);
+        } else {
+            alert('Please calculate emissions first');
+        }
+    });
 }
 
 // XML Download Button
