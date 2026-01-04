@@ -23,6 +23,15 @@ import { calculationResults } from './config.js';
 // Initialize authentication on page load
 initAuth();
 
+// Check URL parameters to auto-open calculator
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('action') === 'openCalculator') {
+    // Wait a bit for DOM to be ready, then open calculator
+    setTimeout(() => {
+        openCalculator();
+    }, 100);
+}
+
 // Initialize Lucide icons
 if (window.lucide) {
     window.lucide.createIcons();

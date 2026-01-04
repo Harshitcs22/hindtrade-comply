@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | HindTrade Comply</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        background: '#050505',
+                        surface: '#0A0A0A',
+                        border: '#27272a',
+                        primary: '#10b981',
+                        textMain: '#E5E5E5',
+                        textMuted: '#737373',
+                    },
+                    letterSpacing: {
+                        tight: '-0.025em',
+                        tighter: '-0.04em',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-textMain selection:bg-primary/30 selection:text-white">
+
+    <!-- Loading Screen -->
+    <div id="authLoadingScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-background">
+        <div class="text-center">
+            <div class="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
+            <div class="text-white text-lg font-medium mb-2">Verifying Secure Session...</div>
+            <div class="text-textMuted text-sm">Please wait while we authenticate your credentials</div>
+        </div>
+    </div>
+
+    <div id="dashboardContent" class="flex min-h-screen hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 border-r border-white/5 bg-surface/50 backdrop-blur-md flex flex-col">
+            <!-- Logo -->
+            <div class="h-16 px-6 flex items-center border-b border-white/5">
+                <div class="flex items-center font-medium tracking-tight text-sm text-white group cursor-pointer">
+                    HindTrade <span class="text-textMuted ml-1 group-hover:text-primary transition-colors">Comply</span>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="p-6 border-b border-white/5">
+                <div class="flex items-center gap-3 mb-3">
+                    <div id="userAvatar" class="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center font-medium text-sm">
+                        U
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div id="userName" class="text-sm font-medium text-white truncate">Loading...</div>
+                        <div id="userCompany" class="text-xs text-textMuted truncate">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 p-4">
+                <div class="space-y-1">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded bg-white/5 text-white text-sm font-medium">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        Dashboard
+                    </a>
+                    <a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 text-textMuted hover:text-white text-sm transition">
+                        <i data-lucide="calculator" class="w-4 h-4"></i>
+                        Calculator
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Logout Button -->
+            <div class="p-4 border-t border-white/5">
+                <button id="logoutBtn" class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 text-textMuted hover:text-white text-sm transition">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1">
+            <!-- Header -->
+            <header class="h-16 px-8 border-b border-white/5 flex items-center justify-between">
+                <h1 class="text-xl font-medium text-white tracking-tight">Dashboard</h1>
+                <a href="https://hindtradeai.vercel.app/" target="_blank" class="text-xs text-textMuted hover:text-white transition">
+                    Parent Company
+                </a>
+            </header>
+
+            <!-- Content Area -->
+            <div class="p-8">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- Total Reports Card -->
+                    <div class="p-6 rounded-lg border border-white/10 bg-surface/50">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-sm text-textMuted">Total Reports</div>
+                            <i data-lucide="file-text" class="w-4 h-4 text-primary"></i>
+                        </div>
+                        <div id="kpiTotalReports" class="text-3xl font-medium text-white">0</div>
+                    </div>
+
+                    <!-- Avg Intensity Card -->
+                    <div class="p-6 rounded-lg border border-white/10 bg-surface/50">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-sm text-textMuted">Avg Carbon Intensity</div>
+                            <i data-lucide="activity" class="w-4 h-4 text-primary"></i>
+                        </div>
+                        <div id="kpiAvgIntensity" class="text-3xl font-medium text-white">--</div>
+                        <div class="text-xs text-textMuted mt-1">kg CO₂/kg product</div>
+                    </div>
+                </div>
+
+                <!-- Recent Filings Section -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-medium text-white">Recent Filings</h2>
+                        <button id="createReportBtn" class="px-4 py-2 rounded bg-primary hover:bg-primary/90 text-black text-sm font-medium transition flex items-center gap-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            Create Report
+                        </button>
+                    </div>
+
+                    <!-- Reports Table Container -->
+                    <div id="reportsTableContainer" class="rounded-lg border border-white/10 bg-surface/50 overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-white/5">
+                                <tr>
+                                    <th class="text-left px-6 py-3 text-xs font-medium text-textMuted uppercase tracking-wider">CN Code</th>
+                                    <th class="text-left px-6 py-3 text-xs font-medium text-textMuted uppercase tracking-wider">Product Type</th>
+                                    <th class="text-left px-6 py-3 text-xs font-medium text-textMuted uppercase tracking-wider">Intensity</th>
+                                    <th class="text-left px-6 py-3 text-xs font-medium text-textMuted uppercase tracking-wider">Status</th>
+                                    <th class="text-left px-6 py-3 text-xs font-medium text-textMuted uppercase tracking-wider">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportsTableBody" class="divide-y divide-white/5">
+                                <!-- Dynamic rows will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty State Container -->
+                    <div id="emptyStateContainer" class="hidden rounded-lg border border-white/10 bg-surface/50 p-12">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-4">
+                                <i data-lucide="file-plus" class="w-8 h-8"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-white mb-2">No reports generated yet</h3>
+                            <p class="text-sm text-textMuted mb-6 max-w-md mx-auto">
+                                Start your first CBAM calculation today to see data here.
+                            </p>
+                            <button id="emptyStateCreateBtn" class="px-6 py-3 rounded bg-primary hover:bg-primary/90 text-black text-sm font-medium transition">
+                                Create Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disclaimer Footer -->
+                <div class="pt-6 border-t border-white/5">
+                    <p class="text-xs text-textMuted/50 leading-relaxed">
+                        <strong class="text-textMuted">HindTrade Comply v1.0 (Beta)</strong> • The Auditor Network is currently in a demonstration phase for testing purposes. You will be notified when live verification services are fully operational. Thank you for joining us as an early adopter.
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="assets/js/dashboard.js"></script>
+</body>
+</html>

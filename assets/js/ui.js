@@ -27,8 +27,8 @@ export async function initAuth() {
 function updateAuthButton(isLoggedIn) {
     const authBtn = document.getElementById('authBtn');
     if (isLoggedIn) {
-        authBtn.textContent = 'Logout';
-        authBtn.onclick = handleLogout;
+        authBtn.textContent = 'Dashboard';
+        authBtn.onclick = () => window.location.href = 'dashboard.html';
     } else {
         authBtn.textContent = 'Login';
         authBtn.onclick = openAuthModal;
@@ -87,11 +87,11 @@ export async function handleLogin(e) {
         errorDiv.classList.remove('hidden');
     } else {
         currentUser = data.user;
-        successDiv.textContent = 'Login successful!';
+        successDiv.textContent = 'Login successful! Redirecting to dashboard...';
         successDiv.classList.remove('hidden');
         updateAuthButton(true);
         setTimeout(() => {
-            closeAuthModal();
+            window.location.href = 'dashboard.html';
         }, 1000);
     }
 }
@@ -137,15 +137,15 @@ export async function handleSignup() {
         errorDiv.textContent = error.message || 'Signup failed. Please try again.';
         errorDiv.classList.remove('hidden');
     } else {
-        successDiv.textContent = 'Account created! Please check your email to verify.';
+        successDiv.textContent = 'Account created! Redirecting to dashboard...';
         successDiv.classList.remove('hidden');
         // Auto-login after signup
         if (data.user) {
             currentUser = data.user;
             updateAuthButton(true);
             setTimeout(() => {
-                closeAuthModal();
-            }, 2000);
+                window.location.href = 'dashboard.html';
+            }, 1500);
         }
     }
 }
