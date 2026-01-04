@@ -3,24 +3,21 @@
  * Handles authentication, profile display, and dynamic report rendering
  */
 
-import { auth } from './supabase-client.js';
+import { auth, db } from './supabase-client.js';
 
-// Initialize Supabase client reference (will be loaded dynamically)
+// Supabase client reference
 let supabase = null;
 
 /**
  * Initialize Supabase client
  */
 async function initSupabase() {
-    try {
-        const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-        const SUPABASE_URL = 'https://pcqsopnhpahcvpaxspik.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjcXNvcG5ocGFoY3ZwYXhzcGlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NzA2NTgsImV4cCI6MjA4MzA0NjY1OH0.e1L5khCp70kdYmR00aT-MfPhHDS_JeuZBW_a3lu5eC8';
-        supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabase = await db.getClient();
+    if (supabase) {
         console.log('✅ Supabase client initialized for dashboard');
         return true;
-    } catch (error) {
-        console.error('❌ Failed to load Supabase SDK:', error);
+    } else {
+        console.error('❌ Failed to get Supabase client');
         return false;
     }
 }
@@ -31,7 +28,7 @@ async function initSupabase() {
 async function checkAuth() {
     const { data: user, error } = await auth.getUser();
     
-    if (!user || error) {
+    if (error || !user) {
         console.log('User not authenticated, redirecting to index.html');
         window.location.href = 'index.html';
         return null;
@@ -71,18 +68,25 @@ async function fetchProfile(userId) {
 function updateProfileUI(user, profile) {
     // Update user name
     const userName = document.getElementById('userName');
-    const displayName = profile?.full_name || user.email?.split('@')[0] || 'User';
-    userName.textContent = displayName;
+    if (userName) {
+        const displayName = profile?.full_name || user.email?.split('@')[0] || 'User';
+        userName.textContent = displayName;
+    }
     
     // Update company name
     const userCompany = document.getElementById('userCompany');
-    const companyName = profile?.company_name || 'Independent Exporter';
-    userCompany.textContent = companyName;
+    if (userCompany) {
+        const companyName = profile?.company_name || 'Independent Exporter';
+        userCompany.textContent = companyName;
+    }
     
     // Update avatar with first letter
     const userAvatar = document.getElementById('userAvatar');
-    const initial = displayName.charAt(0).toUpperCase();
-    userAvatar.textContent = initial;
+    if (userAvatar) {
+        const displayName = profile?.full_name || user.email?.split('@')[0] || 'User';
+        const initial = displayName.charAt(0).toUpperCase();
+        userAvatar.textContent = initial;
+    }
 }
 
 /**
@@ -116,17 +120,23 @@ async function fetchReports(userId) {
 function updateKPIs(reports) {
     // Total Reports
     const totalReports = reports.length;
-    document.getElementById('kpiTotalReports').textContent = totalReports;
+    const kpiTotalReportsEl = document.getElementById('kpiTotalReports');
+    if (kpiTotalReportsEl) {
+        kpiTotalReportsEl.textContent = totalReports;
+    }
     
     // Average Intensity
-    if (totalReports > 0) {
-        const totalIntensity = reports.reduce((sum, report) => {
-            return sum + (parseFloat(report.intensity) || 0);
-        }, 0);
-        const avgIntensity = totalIntensity / totalReports;
-        document.getElementById('kpiAvgIntensity').textContent = avgIntensity.toFixed(3);
-    } else {
-        document.getElementById('kpiAvgIntensity').textContent = '--';
+    const kpiAvgIntensityEl = document.getElementById('kpiAvgIntensity');
+    if (kpiAvgIntensityEl) {
+        if (totalReports > 0) {
+            const totalIntensity = reports.reduce((sum, report) => {
+                return sum + (parseFloat(report.intensity) || 0);
+            }, 0);
+            const avgIntensity = totalIntensity / totalReports;
+            kpiAvgIntensityEl.textContent = avgIntensity.toFixed(3);
+        } else {
+            kpiAvgIntensityEl.textContent = '--';
+        }
     }
 }
 

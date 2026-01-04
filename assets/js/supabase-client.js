@@ -121,6 +121,15 @@ export const auth = {
  */
 export const db = {
     /**
+     * Get the Supabase client
+     * @returns {Promise<Object>} Supabase client
+     */
+    async getClient() {
+        await supabaseLoading; // Wait for Supabase to load
+        return supabase;
+    },
+
+    /**
      * Save a CBAM report to the database
      * @param {Object} reportData - Report data containing calculation results
      * @returns {Promise<{data, error}>}
