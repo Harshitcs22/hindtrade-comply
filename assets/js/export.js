@@ -6,9 +6,13 @@ import { calculationResults, CONSTANTS } from './config.js';
 
 /**
  * Generate PDF Certificate
+ * @param {Object} data - Calculation results (optional, uses calculationResults if not provided)
+ * @param {string} reportId - UUID from Supabase database
  */
-export function generatePDF() {
-    if (!calculationResults) {
+export function generatePDF(data = null, reportId = null) {
+    const results = data || calculationResults;
+    
+    if (!results) {
         alert('Please calculate emissions first');
         return;
     }
@@ -32,19 +36,20 @@ export function generatePDF() {
 
     doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
-    const certId = 'CBAM-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    // Use reportId from Supabase if available, otherwise generate a temporary one
+    const certId = reportId || ('CBAM-' + Math.random().toString(36).substr(2, 9).toUpperCase());
     const currentDate = new Date().toLocaleDateString('en-GB');
     
     doc.text(`Certificate ID: ${certId}`, 20, 55);
     doc.text(`Issue Date: ${currentDate}`, 20, 62);
     doc.text(`Valid Until: 31 March 2026`, 20, 69);
-    doc.text(`CN Code: ${calculationResults.cnCode}`, 20, 76);
+    doc.text(`CN Code: ${results.cnCode}`, 20, 76);
 
     // Main Result
     doc.setFontSize(14);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(16, 185, 129);
-    doc.text(`Embedded Intensity: ${calculationResults.intensity.toFixed(3)} tCO₂e/tonne`, 20, 90);
+    doc.text(`Embedded Intensity: ${results.intensity.toFixed(3)} tCO₂e/tonne`, 20, 90);
     doc.setTextColor(0, 0, 0);
 
     // Emissions Breakdown Table
@@ -52,10 +57,10 @@ export function generatePDF() {
         startY: 100,
         head: [['Emission Scope', 'Value (tCO₂e)']],
         body: [
-            ['Scope 1 (Direct Fuel)', calculationResults.scope1.toFixed(2)],
-            ['Scope 2 (Electricity)', calculationResults.scope2.toFixed(2)],
-            ['Scope 3 (Precursors)', calculationResults.scope3.toFixed(2)],
-            ['Total Emissions', calculationResults.total.toFixed(2)]
+            ['Scope 1 (Direct Fuel)', results.scope1.toFixed(2)],
+            ['Scope 2 (Electricity)', results.scope2.toFixed(2)],
+            ['Scope 3 (Precursors)', results.scope3.toFixed(2)],
+            ['Total Emissions', results.total.toFixed(2)]
         ],
         theme: 'striped',
         headStyles: { fillColor: [16, 185, 129] },

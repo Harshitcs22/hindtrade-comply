@@ -89,6 +89,10 @@ export function calculate() {
     const totalEmissions = scope1Total + scope2Total + scope3Total;
     const embeddedIntensity = totalEmissions / productionQty;
 
+    // Detect product type
+    const prefix = cnCode.substring(0, 2);
+    const productType = CBAM_GOODS[prefix] || 'Other CBAM Goods';
+
     // Store results
     const results = {
         scope1: scope1Total,
@@ -97,7 +101,8 @@ export function calculate() {
         total: totalEmissions,
         intensity: embeddedIntensity,
         cnCode: cnCode,
-        productionQty: productionQty
+        productionQty: productionQty,
+        productType: productType
     };
     setCalculationResults(results);
 

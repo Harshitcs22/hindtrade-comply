@@ -57,8 +57,8 @@
                 <a href="https://hindtradeai.vercel.app/" target="_blank" class="hover:text-white transition">
                     Parent Company
                 </a>
-                <button class="text-white px-3 py-1.5 rounded bg-white/10 hover:bg-white/15 transition border border-white/10">
-                    Sign In
+                <button id="authBtn" class="text-white px-3 py-1.5 rounded bg-white/10 hover:bg-white/15 transition border border-white/10">
+                    Login
                 </button>
             </div>
         </div>
@@ -473,6 +473,77 @@
                     </div>
 
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-sm">
+        <div class="h-full flex items-center justify-center p-6">
+            <div class="w-full max-w-md p-8 rounded-lg border border-white/10 bg-[#0A0A0A]/95 backdrop-blur-md relative">
+                <!-- Close Button -->
+                <button id="closeAuthBtn" class="absolute top-4 right-4 text-textMuted hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+
+                <!-- Modal Title -->
+                <h2 class="text-2xl font-medium text-white tracking-tight mb-2">Welcome Back</h2>
+                <p class="text-sm text-textMuted mb-6">Sign in to save and manage your CBAM reports</p>
+
+                <!-- Auth Form -->
+                <form id="authForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">Email</label>
+                        <input 
+                            type="email" 
+                            id="authEmail" 
+                            required
+                            placeholder="you@example.com"
+                            class="w-full px-4 py-3 rounded bg-[#050505] border border-white/20 text-white text-sm focus:border-emerald-400 focus:outline-none transition"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">Password</label>
+                        <input 
+                            type="password" 
+                            id="authPassword" 
+                            required
+                            placeholder="••••••••"
+                            minlength="6"
+                            class="w-full px-4 py-3 rounded bg-[#050505] border border-white/20 text-white text-sm focus:border-emerald-400 focus:outline-none transition"
+                        >
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="authError" class="hidden p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-xs"></div>
+
+                    <!-- Success Message -->
+                    <div id="authSuccess" class="hidden p-3 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs"></div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-3 pt-2">
+                        <button 
+                            type="submit" 
+                            id="loginBtn" 
+                            class="flex-1 py-3 rounded bg-emerald-500 hover:bg-emerald-600 text-black font-medium text-sm transition"
+                        >
+                            Login
+                        </button>
+                        <button 
+                            type="button" 
+                            id="signupBtn" 
+                            class="flex-1 py-3 rounded border border-white/20 text-white text-sm hover:bg-white/5 transition"
+                        >
+                            Sign Up
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Info Text -->
+                <p class="text-xs text-textMuted mt-6 text-center">
+                    Your reports are securely stored and accessible anytime
+                </p>
             </div>
         </div>
     </div>
