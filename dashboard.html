@@ -43,7 +43,16 @@
 </head>
 <body class="bg-background text-textMain selection:bg-primary/30 selection:text-white">
 
-    <div class="flex min-h-screen">
+    <!-- Loading Screen -->
+    <div id="authLoadingScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-background">
+        <div class="text-center">
+            <div class="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
+            <div class="text-white text-lg font-medium mb-2">Verifying Secure Session...</div>
+            <div class="text-textMuted text-sm">Please wait while we authenticate your credentials</div>
+        </div>
+    </div>
+
+    <div id="dashboardContent" class="flex min-h-screen hidden">
         <!-- Sidebar -->
         <aside class="w-64 border-r border-white/5 bg-surface/50 backdrop-blur-md flex flex-col">
             <!-- Logo -->
