@@ -6,9 +6,13 @@ import { calculationResults, CONSTANTS } from './config.js';
 
 /**
  * Generate PDF Certificate
+ * @param {Object} results - Calculation results (optional, uses global if not provided)
+ * @param {string} reportId - UUID from Supabase
  */
-export function generatePDF() {
-    if (!calculationResults) {
+export function generatePDF(results = null, reportId = null) {
+    const data = results || calculationResults;
+    
+    if (!data) {
         alert('Please calculate emissions first');
         return;
     }
@@ -32,19 +36,20 @@ export function generatePDF() {
 
     doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
-    const certId = 'CBAM-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    // Use reportId if provided, otherwise generate random ID
+    const certId = reportId || ('CBAM-' + Math.random().toString(36).substr(2, 9).toUpperCase());
     const currentDate = new Date().toLocaleDateString('en-GB');
     
     doc.text(`Certificate ID: ${certId}`, 20, 55);
     doc.text(`Issue Date: ${currentDate}`, 20, 62);
     doc.text(`Valid Until: 31 March 2026`, 20, 69);
-    doc.text(`CN Code: ${calculationResults.cnCode}`, 20, 76);
+    doc.text(`CN Code: ${data.cnCode}`, 20, 76);
 
     // Main Result
     doc.setFontSize(14);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(16, 185, 129);
-    doc.text(`Embedded Intensity: ${calculationResults.intensity.toFixed(3)} tCO₂e/tonne`, 20, 90);
+    doc.text(`Embedded Intensity: ${data.intensity.toFixed(3)} tCO₂e/tonne`, 20, 90);
     doc.setTextColor(0, 0, 0);
 
     // Emissions Breakdown Table
@@ -52,10 +57,10 @@ export function generatePDF() {
         startY: 100,
         head: [['Emission Scope', 'Value (tCO₂e)']],
         body: [
-            ['Scope 1 (Direct Fuel)', calculationResults.scope1.toFixed(2)],
-            ['Scope 2 (Electricity)', calculationResults.scope2.toFixed(2)],
-            ['Scope 3 (Precursors)', calculationResults.scope3.toFixed(2)],
-            ['Total Emissions', calculationResults.total.toFixed(2)]
+            ['Scope 1 (Direct Fuel)', data.scope1.toFixed(2)],
+            ['Scope 2 (Electricity)', data.scope2.toFixed(2)],
+            ['Scope 3 (Precursors)', data.scope3.toFixed(2)],
+            ['Total Emissions', data.total.toFixed(2)]
         ],
         theme: 'striped',
         headStyles: { fillColor: [16, 185, 129] },
@@ -104,14 +109,19 @@ export function generatePDF() {
 
 /**
  * Generate XML Report
+ * @param {Object} results - Calculation results (optional, uses global if not provided)
+ * @param {string} reportId - UUID from Supabase
  */
-export function generateXML() {
-    if (!calculationResults) {
+export function generateXML(results = null, reportId = null) {
+    const data = results || calculationResults;
+    
+    if (!data) {
         alert('Please calculate emissions first');
         return;
     }
 
-    const certId = 'CBAM-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    // Use reportId if provided, otherwise generate random ID
+    const certId = reportId || ('CBAM-' + Math.random().toString(36).substr(2, 9).toUpperCase());
     const currentDate = new Date().toISOString();
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -120,14 +130,14 @@ export function generateXML() {
         <ID>${certId}</ID>
         <IssueDate>${currentDate}</IssueDate>
         <ValidUntil>2026-03-31T23:59:59Z</ValidUntil>
-        <CNCode>${calculationResults.cnCode}</CNCode>
+        <CNCode>${data.cnCode}</CNCode>
     </Certificate>
     <EmbeddedEmissions>
-        <TotalIntensity unit="tCO2e/tonne">${calculationResults.intensity.toFixed(3)}</TotalIntensity>
-        <Scope1 unit="tCO2e">${calculationResults.scope1.toFixed(2)}</Scope1>
-        <Scope2 unit="tCO2e">${calculationResults.scope2.toFixed(2)}</Scope2>
-        <Scope3 unit="tCO2e">${calculationResults.scope3.toFixed(2)}</Scope3>
-        <TotalEmissions unit="tCO2e">${calculationResults.total.toFixed(2)}</TotalEmissions>
+        <TotalIntensity unit="tCO2e/tonne">${data.intensity.toFixed(3)}</TotalIntensity>
+        <Scope1 unit="tCO2e">${data.scope1.toFixed(2)}</Scope1>
+        <Scope2 unit="tCO2e">${data.scope2.toFixed(2)}</Scope2>
+        <Scope3 unit="tCO2e">${data.scope3.toFixed(2)}</Scope3>
+        <TotalEmissions unit="tCO2e">${data.total.toFixed(2)}</TotalEmissions>
     </EmbeddedEmissions>
     <Methodology>
         <Standard>ISO 14067 + CBAM Annex III</Standard>
@@ -135,7 +145,7 @@ export function generateXML() {
         <Country>India</Country>
     </Methodology>
     <Production>
-        <Quantity unit="tonnes">${calculationResults.productionQty}</Quantity>
+        <Quantity unit="tonnes">${data.productionQty}</Quantity>
     </Production>
 </CBAMReport>`;
 
