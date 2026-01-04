@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | HindTrade Comply</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        background: '#050505',
+                        surface: '#0A0A0A',
+                        border: '#27272a',
+                        primary: '#10b981',
+                        textMain: '#E5E5E5',
+                        textMuted: '#737373',
+                    },
+                    letterSpacing: {
+                        tight: '-0.025em',
+                        tighter: '-0.04em',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="selection:bg-primary/30 selection:text-white min-h-screen flex flex-col">
+
+    <nav class="fixed w-full z-50 border-b border-white/5 bg-[#050505]/80 backdrop-blur-md">
+        <div class="max-w-5xl mx-auto px-6 h-16 flex justify-between items-center">
+            <a href="/" class="flex items-center font-medium tracking-tight text-sm text-white group cursor-pointer">
+                HindTrade <span class="text-textMuted ml-1 group-hover:text-primary transition-colors">Comply</span>
+            </a>
+            <div class="flex items-center gap-6 text-xs font-medium text-textMuted">
+                <a href="signup.html" class="text-white px-3 py-1.5 rounded bg-white/10 hover:bg-white/15 transition border border-white/10">
+                    Sign Up
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 flex items-center justify-center pt-16 pb-8 px-6">
+        <div class="w-full max-w-md">
+            <div class="p-8 rounded-lg border border-white/10 bg-[#0A0A0A]/95 backdrop-blur-md">
+                <h1 class="text-2xl font-medium text-white tracking-tight mb-2">Welcome Back</h1>
+                <p class="text-sm text-textMuted mb-6">Sign in to access your CBAM reports</p>
+
+                <form id="loginForm" class="space-y-4">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-white mb-2">
+                            Email
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            required
+                            autocomplete="email"
+                            placeholder="you@example.com"
+                            aria-describedby="emailHelp"
+                            class="w-full px-4 py-3 rounded bg-[#050505] border border-white/20 text-white text-sm focus:border-emerald-400 focus:outline-none transition"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-white mb-2">
+                            Password
+                        </label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password"
+                            required
+                            autocomplete="current-password"
+                            placeholder="••••••••"
+                            minlength="6"
+                            class="w-full px-4 py-3 rounded bg-[#050505] border border-white/20 text-white text-sm focus:border-emerald-400 focus:outline-none transition"
+                        >
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="hidden p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-xs" role="alert" aria-live="polite"></div>
+
+                    <!-- Success Message -->
+                    <div id="successMessage" class="hidden p-3 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs" role="status" aria-live="polite"></div>
+
+                    <button 
+                        type="submit" 
+                        id="loginBtn" 
+                        class="w-full py-3 rounded bg-emerald-500 hover:bg-emerald-600 text-black font-medium text-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Login
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-textMuted">
+                        Don't have an account? 
+                        <a href="signup.html" class="text-emerald-400 hover:text-emerald-300 transition">
+                            Sign up
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-6 text-center border-t border-white/5">
+        <div class="text-xs text-textMuted">
+            © 2026 HindTrade Comply • <a href="/" class="hover:text-white transition">Home</a>
+        </div>
+    </footer>
+
+    <!-- Supabase Client -->
+    <script type="module">
+        import { auth } from './assets/js/supabase-client.js';
+
+        // Check if already logged in
+        (async function checkExistingSession() {
+            console.log('🔍 Checking for existing session...');
+            const session = await auth.checkSession();
+            if (session) {
+                console.log('📌 Already logged in, redirecting to dashboard');
+                window.location.href = '/dashboard.html';
+            }
+        })();
+
+        // Initialize Lucide icons
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+
+        // DOM Elements
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+
+        /**
+         * Show error message
+         * @param {string} message - Error message to display
+         */
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            successMessage.classList.add('hidden');
+        }
+
+        /**
+         * Show success message
+         * @param {string} message - Success message to display
+         */
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+        }
+
+        /**
+         * Set loading state
+         * @param {boolean} isLoading - Whether form is loading
+         */
+        function setLoading(isLoading) {
+            loginBtn.disabled = isLoading;
+            loginBtn.textContent = isLoading ? 'Logging in...' : 'Login';
+        }
+
+        /**
+         * Handle form submission
+         * @param {Event} e - Submit event
+         */
+        async function handleSubmit(e) {
+            e.preventDefault();
+            
+            // Clear previous messages
+            errorMessage.classList.add('hidden');
+            successMessage.classList.add('hidden');
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            // Basic validation
+            if (!email || !password) {
+                showError('Please enter both email and password.');
+                return;
+            }
+
+            // Set loading state
+            setLoading(true);
+
+            try {
+                console.log('🔑 Attempting login...');
+                const { data, error } = await auth.signIn(email, password);
+
+                if (error) {
+                    console.error('❌ Login error:', error.message);
+                    showError(error.message || 'Login failed. Please check your credentials.');
+                    setLoading(false);
+                    return;
+                }
+
+                console.log('✅ Login successful');
+                showSuccess('Login successful! Redirecting...');
+
+                // Verify session is active
+                const session = await auth.checkSession();
+                if (session) {
+                    console.log('📌 Session verified, redirecting to dashboard');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard.html';
+                    }, 500);
+                } else {
+                    console.error('❌ Session not found after login');
+                    showError('Session could not be verified. Please try again.');
+                    setLoading(false);
+                }
+            } catch (err) {
+                console.error('❌ Login exception:', err);
+                showError('An unexpected error occurred. Please try again.');
+                setLoading(false);
+            }
+        }
+
+        // Event Listeners
+        loginForm.addEventListener('submit', handleSubmit);
+
+        // Allow Enter key on password field
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                loginForm.requestSubmit();
+            }
+        });
+
+        console.log('📄 Login page initialized');
+    </script>
+</body>
+</html>

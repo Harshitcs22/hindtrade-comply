@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | HindTrade Comply</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- CBAM Calculator Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        background: '#050505',
+                        surface: '#0A0A0A',
+                        border: '#27272a',
+                        primary: '#10b981',
+                        textMain: '#E5E5E5',
+                        textMuted: '#737373',
+                    },
+                    letterSpacing: {
+                        tight: '-0.025em',
+                        tighter: '-0.04em',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Hide body until session is verified -->
+    <style>
+        body { display: none; }
+    </style>
+</head>
+<body class="selection:bg-primary/30 selection:text-white min-h-screen flex flex-col">
+
+    <nav class="fixed w-full z-50 border-b border-white/5 bg-[#050505]/80 backdrop-blur-md">
+        <div class="max-w-5xl mx-auto px-6 h-16 flex justify-between items-center">
+            <a href="/" class="flex items-center font-medium tracking-tight text-sm text-white group cursor-pointer">
+                HindTrade <span class="text-textMuted ml-1 group-hover:text-primary transition-colors">Comply</span>
+            </a>
+            <div class="flex items-center gap-6 text-xs font-medium text-textMuted">
+                <span id="userEmail" class="text-white/80"></span>
+                <button id="logoutBtn" class="text-white px-3 py-1.5 rounded bg-red-500/20 hover:bg-red-500/30 transition border border-red-500/30">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 pt-24 pb-8 px-6">
+        <div class="max-w-5xl mx-auto">
+            <!-- Welcome Section -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-medium text-white tracking-tight mb-2">Dashboard</h1>
+                <p class="text-textMuted">Welcome back! Manage your CBAM compliance reports here.</p>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <a href="/" class="spotlight-card p-6 rounded-lg border border-white/10 bg-[#0A0A0A] hover:border-emerald-400/30 transition group">
+                    <div class="text-primary mb-4">
+                        <i data-lucide="calculator" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-white font-medium mb-2">New Calculation</h3>
+                    <p class="text-textMuted text-sm">Generate a new CBAM emissions report</p>
+                </a>
+
+                <div class="spotlight-card p-6 rounded-lg border border-white/10 bg-[#0A0A0A]">
+                    <div class="text-primary mb-4">
+                        <i data-lucide="file-text" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-white font-medium mb-2">My Reports</h3>
+                    <p class="text-textMuted text-sm">View and download your saved reports</p>
+                    <span class="inline-block mt-2 text-xs text-textMuted/60">Coming soon</span>
+                </div>
+
+                <div class="spotlight-card p-6 rounded-lg border border-white/10 bg-[#0A0A0A]">
+                    <div class="text-primary mb-4">
+                        <i data-lucide="settings" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-white font-medium mb-2">Settings</h3>
+                    <p class="text-textMuted text-sm">Manage your account settings</p>
+                    <span class="inline-block mt-2 text-xs text-textMuted/60">Coming soon</span>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="p-6 rounded-lg border border-white/10 bg-[#0A0A0A]">
+                <h2 class="text-lg font-medium text-white mb-4">Recent Activity</h2>
+                <div class="text-center py-8 text-textMuted">
+                    <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 opacity-40"></i>
+                    <p>No recent activity</p>
+                    <p class="text-sm mt-1">Your CBAM calculations will appear here</p>
+                    <a href="/" class="inline-block mt-4 px-6 py-2 rounded bg-emerald-500 hover:bg-emerald-600 text-black text-sm font-medium transition">
+                        Create Your First Report
+                    </a>
+                </div>
+            </div>
+
+            <!-- Account Info -->
+            <div class="mt-8 p-6 rounded-lg border border-white/5 bg-[#080808]">
+                <h2 class="text-lg font-medium text-white mb-4">Account Information</h2>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-textMuted">Email:</span>
+                        <span id="accountEmail" class="text-white ml-2"></span>
+                    </div>
+                    <div>
+                        <span class="text-textMuted">Account Status:</span>
+                        <span class="text-emerald-400 ml-2">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-6 text-center border-t border-white/5">
+        <div class="text-xs text-textMuted">
+            © 2026 HindTrade Comply • <a href="/" class="hover:text-white transition">Home</a>
+        </div>
+    </footer>
+
+    <!-- Supabase Client -->
+    <script type="module">
+        import { auth } from './assets/js/supabase-client.js';
+
+        // Protect dashboard - must verify session before showing content
+        (async function protectDashboard() {
+            console.log('🔒 Protecting dashboard - checking session...');
+            const session = await auth.checkSession();
+            
+            if (!session) {
+                console.log('❌ No session found, redirecting to login');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            console.log('✅ Session verified for:', session.user?.email);
+            
+            // Show body now that session is verified
+            document.body.style.display = 'flex';
+            
+            // Display user info (textContent is XSS-safe)
+            const userEmail = session.user?.email || 'Unknown';
+            
+            document.getElementById('userEmail').textContent = userEmail;
+            document.getElementById('accountEmail').textContent = userEmail;
+            
+            // Initialize Lucide icons
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        })();
+
+        // Spotlight effect for cards
+        const cards = document.querySelectorAll('.spotlight-card');
+        cards.forEach(card => {
+            card.onmousemove = e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            }
+        });
+
+        // Logout handler
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            console.log('🔑 Logging out...');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const originalText = logoutBtn.textContent;
+            
+            logoutBtn.textContent = 'Logging out...';
+            logoutBtn.disabled = true;
+            
+            try {
+                const { error } = await auth.signOut();
+                
+                if (error) {
+                    console.error('❌ Logout error:', error.message);
+                    alert('Logout failed. Please try again.');
+                    logoutBtn.textContent = originalText;
+                    logoutBtn.disabled = false;
+                    return;
+                }
+                
+                console.log('✅ Logout successful');
+                window.location.href = '/login.html';
+            } catch (err) {
+                console.error('❌ Logout exception:', err);
+                alert('An error occurred. Please try again.');
+                logoutBtn.textContent = originalText;
+                logoutBtn.disabled = false;
+            }
+        });
+
+        // Listen for auth state changes
+        window.addEventListener('authStateChange', (event) => {
+            const { user, session } = event.detail;
+            if (!session) {
+                console.log('🔒 Session lost, redirecting to login');
+                window.location.href = '/login.html';
+            }
+        });
+
+        console.log('📄 Dashboard initialized');
+    </script>
+</body>
+</html>
