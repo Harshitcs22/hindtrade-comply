@@ -70,9 +70,14 @@ const authBtn = document.getElementById('authBtn');
 const closeAuthBtn = document.getElementById('closeAuthBtn');
 const loginBtn = document.getElementById('loginBtn');
 const signupBtn = document.getElementById('signupBtn');
+const signUpNavBtn = document.getElementById('signUpNavBtn');
 
 if (authBtn) {
     authBtn.addEventListener('click', handleAuthButtonClick);
+}
+
+if (signUpNavBtn) {
+    signUpNavBtn.addEventListener('click', () => openAuthModal('signup'));
 }
 
 if (closeAuthBtn) {

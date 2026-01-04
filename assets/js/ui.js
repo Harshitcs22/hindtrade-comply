@@ -161,28 +161,54 @@ export async function initAuth() {
  */
 function updateAuthButton(isLoggedIn, email = '') {
     const authBtn = document.getElementById('authBtn');
+    const signUpNavBtn = document.getElementById('signUpNavBtn');
+    const authButtons = document.getElementById('authButtons');
+    
     if (!authBtn) return;
 
     if (isLoggedIn) {
+        // Hide sign up button and update login button to logout
+        if (signUpNavBtn) signUpNavBtn.style.display = 'none';
         authBtn.textContent = 'Logout';
         authBtn.title = `Logged in as ${email}`;
+        authBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
+        authBtn.classList.add('bg-white/10', 'hover:bg-white/15');
     } else {
+        // Show both buttons when logged out
+        if (signUpNavBtn) signUpNavBtn.style.display = 'block';
         authBtn.textContent = 'Login';
         authBtn.title = '';
+        authBtn.classList.remove('bg-white/10', 'hover:bg-white/15');
+        authBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600');
     }
 }
 
 /**
- * Open the auth modal
+ * Open the auth modal in specified mode
+ * @param {string} mode - 'login' or 'signup'
  */
-export function openAuthModal() {
+export function openAuthModal(mode = 'login') {
     const modal = document.getElementById('authModal');
     if (modal) {
         modal.classList.remove('hidden');
+        
+        // Update modal header based on mode
+        const modalTitle = modal.querySelector('h2');
+        const modalSubtitle = modal.querySelector('p');
+        
+        if (mode === 'signup') {
+            if (modalTitle) modalTitle.textContent = 'Create Account';
+            if (modalSubtitle) modalSubtitle.textContent = 'Sign up to save and manage your CBAM reports';
+        } else {
+            if (modalTitle) modalTitle.textContent = 'Welcome Back';
+            if (modalSubtitle) modalSubtitle.textContent = 'Sign in to save and manage your CBAM reports';
+        }
+        
         // Clear previous messages
         hideAuthMessages();
         if (window.lucide) window.lucide.createIcons();
     }
+}
 }
 
 /**
