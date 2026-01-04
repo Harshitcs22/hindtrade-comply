@@ -12,6 +12,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CBAM Calculator Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -120,7 +125,7 @@
             </p>
 
             <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <button class="bg-white text-black font-medium px-8 py-3 rounded hover:bg-gray-200 transition text-sm">
+                <button id="openCalculatorBtn" class="bg-white text-black font-medium px-8 py-3 rounded hover:bg-gray-200 transition text-sm">
                     Generate CBAM Report
                 </button>
                 <button class="text-textMuted hover:text-white font-medium px-8 py-3 transition text-sm flex items-center justify-center">
@@ -346,6 +351,175 @@
         </div>
     </footer>
 
+    <!-- CBAM Calculator Modal -->
+    <div id="calculatorModal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-sm">
+        <div class="h-full overflow-y-auto py-8">
+            <div class="max-w-7xl mx-auto px-6">
+                <!-- Modal Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-medium text-white tracking-tight">CBAM Calculator <span class="text-emerald-400">• Q1 2026</span></h2>
+                    <button id="closeCalculatorBtn" class="text-textMuted hover:text-white transition">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <!-- 2-Column Dashboard -->
+                <div class="grid lg:grid-cols-2 gap-6">
+                    
+                    <!-- LEFT PANEL - Inputs -->
+                    <div class="space-y-6">
+                        <!-- CN Code Input -->
+                        <div class="p-6 rounded border border-white/10 bg-[#0A0A0A]">
+                            <label class="block text-sm font-medium text-white mb-2">
+                                CN Code (8-digit)
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    id="cnCode" 
+                                    placeholder="e.g., 72101000"
+                                    maxlength="8"
+                                    class="w-full px-4 py-3 rounded bg-[#050505] border border-white/20 text-white text-sm focus:border-emerald-400 focus:outline-none transition"
+                                >
+                                <div id="cnFeedback" class="absolute right-3 top-3 hidden">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+                                </div>
+                            </div>
+                            <div id="productType" class="mt-2 text-xs text-textMuted"></div>
+                        </div>
+
+                        <!-- Production Quantity -->
+                        <div class="p-6 rounded border border-white/10 bg-[#0A0A0A]">
+                            <label class="block text-sm font-medium text-white mb-2">
+                                Production Quantity (tonnes)
+                            </label>
+                            <input 
+                                type="number" 
+                                id="productionQty" 
+                                placeholder="1000"
+                                class="w-full px-4 py-3 rounded bg-[#050505] border border-white/20 text-white text-sm focus:border-emerald-400 focus:outline-none transition"
+                            >
+                        </div>
+
+                        <!-- Energy Inputs -->
+                        <div class="p-6 rounded border border-white/10 bg-[#0A0A0A]">
+                            <h3 class="text-sm font-medium text-white mb-4">Energy Consumption</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs text-textMuted mb-2">Electricity (kWh)</label>
+                                    <input 
+                                        type="number" 
+                                        id="electricity" 
+                                        placeholder="50000"
+                                        class="w-full px-4 py-2 rounded bg-[#050505] border border-white/20 text-white text-sm focus:border-emerald-400 focus:outline-none transition"
+                                    >
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-textMuted mb-2">Diesel (Liters)</label>
+                                    <input 
+                                        type="number" 
+                                        id="diesel" 
+                                        placeholder="5000"
+                                        class="w-full px-4 py-2 rounded bg-[#050505] border border-white/20 text-white text-sm focus:border-emerald-400 focus:outline-none transition"
+                                    >
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-textMuted mb-2">Coal (Kg)</label>
+                                    <input 
+                                        type="number" 
+                                        id="coal" 
+                                        placeholder="10000"
+                                        class="w-full px-4 py-2 rounded bg-[#050505] border border-white/20 text-white text-sm focus:border-emerald-400 focus:outline-none transition"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Precursor Toggle -->
+                        <div class="p-6 rounded border border-white/10 bg-[#0A0A0A]">
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="text-sm font-medium text-white">Include Complex Goods?</label>
+                                <button id="precursorToggle" class="relative w-12 h-6 rounded-full bg-white/10 transition" data-active="false">
+                                    <div class="absolute w-5 h-5 bg-white rounded-full top-0.5 left-0.5 transition-transform duration-200"></div>
+                                </button>
+                            </div>
+                            
+                            <div id="precursorInputs" class="hidden space-y-3">
+                                <div id="precursorList" class="space-y-2"></div>
+                                <button id="addPrecursorBtn" class="text-xs text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1">
+                                    <i data-lucide="plus" class="w-3 h-3"></i> Add Material
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Calculate Button -->
+                        <button id="calculateBtn" class="w-full py-4 rounded bg-emerald-500 hover:bg-emerald-600 text-black font-medium text-sm transition">
+                            Calculate Embedded Intensity
+                        </button>
+                    </div>
+
+                    <!-- RIGHT PANEL - Outputs -->
+                    <div class="space-y-6">
+                        <!-- Main Display -->
+                        <div class="p-8 rounded border border-emerald-400/30 bg-emerald-500/5">
+                            <div class="text-xs text-emerald-400 uppercase tracking-wider mb-2">Embedded Intensity</div>
+                            <div id="mainResult" class="text-5xl font-bold text-white mb-2">--</div>
+                            <div class="text-sm text-textMuted">tCO₂e per tonne</div>
+                        </div>
+
+                        <!-- Expiry Badge -->
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-purple-400/40 bg-purple-500/10 text-purple-300 text-xs font-medium">
+                            <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                            Valid for Q1 2026
+                        </div>
+
+                        <!-- Breakdown Table -->
+                        <div class="p-6 rounded border border-white/10 bg-[#0A0A0A]">
+                            <h3 class="text-sm font-medium text-white mb-4">Emissions Breakdown</h3>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between items-center pb-2 border-b border-white/10">
+                                    <span class="text-textMuted">Scope 1 (Direct Fuel)</span>
+                                    <span id="scope1Result" class="text-white font-medium">-- tCO₂e</span>
+                                </div>
+                                <div class="flex justify-between items-center pb-2 border-b border-white/10">
+                                    <span class="text-textMuted">Scope 2 (Electricity)</span>
+                                    <span id="scope2Result" class="text-white font-medium">-- tCO₂e</span>
+                                </div>
+                                <div class="flex justify-between items-center pb-2 border-b border-white/10">
+                                    <span class="text-textMuted">Scope 3 (Precursors)</span>
+                                    <span id="scope3Result" class="text-white font-medium">-- tCO₂e</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2">
+                                    <span class="text-white font-medium">Total Emissions</span>
+                                    <span id="totalResult" class="text-emerald-400 font-bold">-- tCO₂e</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="space-y-3">
+                            <button id="downloadPDFBtn" class="w-full py-3 rounded bg-white text-black font-medium text-sm hover:bg-gray-200 transition">
+                                Download PDF Certificate
+                            </button>
+                            <button id="downloadXMLBtn" class="w-full py-3 rounded border border-white/20 text-white text-sm hover:bg-white/5 transition">
+                                Download XML Report
+                            </button>
+                        </div>
+
+                        <!-- Methodology Footer -->
+                        <div class="p-4 rounded border border-white/5 bg-[#050505]">
+                            <p class="text-xs text-textMuted leading-relaxed">
+                                <strong class="text-white">Methodology:</strong> ISO 14067 + CBAM Annex III<br>
+                                <strong class="text-white">Grid Factor:</strong> 0.715 tCO₂e/MWh (India CEA 2026)
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         lucide.createIcons();
 
@@ -360,6 +534,407 @@
                 card.style.setProperty('--mouse-x', `${x}px`);
                 card.style.setProperty('--mouse-y', `${y}px`);
             }
+        });
+
+        // ============================================
+        // CBAM CALCULATOR LOGIC ENGINE (Jan 2026)
+        // ============================================
+
+        // Constants
+        const CONSTANTS = {
+            GRID_FACTOR: 0.715,      // tCO2e per MWh (India CEA 2026)
+            DIESEL_FACTOR: 3.16,      // tCO2e per 1000L
+            COAL_FACTOR: 2.5,         // tCO2e per 1000kg
+            PRECURSORS: {
+                'Iron Ore': 0.8,
+                'Scrap': 0.9,
+                'Aluminum': 0.4,
+                'Coke': 3.6
+            }
+        };
+
+        let precursorCount = 0;
+        let calculationResults = null;
+
+        // Modal Controls
+        const modal = document.getElementById('calculatorModal');
+        const openBtn = document.getElementById('openCalculatorBtn');
+        const closeBtn = document.getElementById('closeCalculatorBtn');
+
+        openBtn.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            loadState();
+            lucide.createIcons();
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        // CN Code Validation
+        const cnCodeInput = document.getElementById('cnCode');
+        const cnFeedback = document.getElementById('cnFeedback');
+        const productType = document.getElementById('productType');
+
+        function validateCNCode(code) {
+            const regex = /^[0-9]{8}$/;
+            const isValid = regex.test(code);
+            
+            if (isValid) {
+                cnFeedback.classList.remove('hidden');
+                cnFeedback.innerHTML = '<i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>';
+                
+                // Auto-detect product type
+                const prefix = code.substring(0, 2);
+                if (prefix === '72') {
+                    productType.textContent = '✓ Detected: Iron & Steel';
+                    productType.classList.add('text-emerald-400');
+                } else if (prefix === '76') {
+                    productType.textContent = '✓ Detected: Aluminum';
+                    productType.classList.add('text-emerald-400');
+                } else {
+                    productType.textContent = '✓ Valid CN Code';
+                    productType.classList.add('text-emerald-400');
+                }
+                lucide.createIcons();
+            } else if (code.length > 0) {
+                cnFeedback.classList.remove('hidden');
+                cnFeedback.innerHTML = '<i data-lucide="x-circle" class="w-5 h-5 text-red-400"></i>';
+                productType.textContent = '✗ Must be exactly 8 digits';
+                productType.classList.remove('text-emerald-400');
+                productType.classList.add('text-red-400');
+                lucide.createIcons();
+            } else {
+                cnFeedback.classList.add('hidden');
+                productType.textContent = '';
+            }
+            
+            return isValid;
+        }
+
+        cnCodeInput.addEventListener('input', (e) => {
+            validateCNCode(e.target.value);
+            saveState();
+        });
+
+        // Precursor Toggle
+        const precursorToggle = document.getElementById('precursorToggle');
+        const precursorInputs = document.getElementById('precursorInputs');
+
+        precursorToggle.addEventListener('click', () => {
+            const isActive = precursorToggle.dataset.active === 'true';
+            precursorToggle.dataset.active = !isActive;
+            
+            if (!isActive) {
+                precursorToggle.classList.add('bg-emerald-500');
+                precursorToggle.querySelector('div').style.transform = 'translateX(1.5rem)';
+                precursorInputs.classList.remove('hidden');
+            } else {
+                precursorToggle.classList.remove('bg-emerald-500');
+                precursorToggle.querySelector('div').style.transform = 'translateX(0)';
+                precursorInputs.classList.add('hidden');
+            }
+            saveState();
+        });
+
+        // Add Precursor Material
+        const addPrecursorBtn = document.getElementById('addPrecursorBtn');
+        const precursorList = document.getElementById('precursorList');
+
+        addPrecursorBtn.addEventListener('click', () => {
+            precursorCount++;
+            const precursorItem = document.createElement('div');
+            precursorItem.className = 'flex gap-2';
+            precursorItem.innerHTML = `
+                <select class="flex-1 px-3 py-2 rounded bg-[#050505] border border-white/20 text-white text-xs focus:border-emerald-400 focus:outline-none transition precursor-type">
+                    <option value="">Select Material</option>
+                    ${Object.keys(CONSTANTS.PRECURSORS).map(p => `<option value="${p}">${p}</option>`).join('')}
+                </select>
+                <input 
+                    type="number" 
+                    placeholder="Tonnes"
+                    class="w-24 px-3 py-2 rounded bg-[#050505] border border-white/20 text-white text-xs focus:border-emerald-400 focus:outline-none transition precursor-qty"
+                >
+                <button class="text-red-400 hover:text-red-300 transition remove-precursor">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            `;
+            precursorList.appendChild(precursorItem);
+            
+            precursorItem.querySelector('.remove-precursor').addEventListener('click', () => {
+                precursorItem.remove();
+                saveState();
+            });
+
+            precursorItem.querySelector('.precursor-type').addEventListener('change', saveState);
+            precursorItem.querySelector('.precursor-qty').addEventListener('input', saveState);
+            
+            lucide.createIcons();
+            saveState();
+        });
+
+        // Core Calculation Function
+        const calculateBtn = document.getElementById('calculateBtn');
+        calculateBtn.addEventListener('click', calculate);
+
+        function calculate() {
+            // Get inputs
+            const cnCode = document.getElementById('cnCode').value;
+            const productionQty = parseFloat(document.getElementById('productionQty').value) || 0;
+            const electricity = parseFloat(document.getElementById('electricity').value) || 0;
+            const diesel = parseFloat(document.getElementById('diesel').value) || 0;
+            const coal = parseFloat(document.getElementById('coal').value) || 0;
+
+            // Validate
+            if (!validateCNCode(cnCode)) {
+                alert('Please enter a valid 8-digit CN Code');
+                return;
+            }
+            if (productionQty <= 0) {
+                alert('Please enter production quantity');
+                return;
+            }
+
+            // Calculate Scope 1 (Direct Fuel)
+            const scope1Diesel = (diesel / 1000) * CONSTANTS.DIESEL_FACTOR;
+            const scope1Coal = (coal / 1000) * CONSTANTS.COAL_FACTOR;
+            const scope1Total = scope1Diesel + scope1Coal;
+
+            // Calculate Scope 2 (Electricity)
+            const scope2Total = (electricity / 1000) * CONSTANTS.GRID_FACTOR;
+
+            // Calculate Scope 3 (Precursors)
+            let scope3Total = 0;
+            const precursorItems = document.querySelectorAll('#precursorList > div');
+            precursorItems.forEach(item => {
+                const type = item.querySelector('.precursor-type').value;
+                const qty = parseFloat(item.querySelector('.precursor-qty').value) || 0;
+                if (type && qty > 0) {
+                    scope3Total += qty * CONSTANTS.PRECURSORS[type];
+                }
+            });
+
+            // Total emissions and embedded intensity
+            const totalEmissions = scope1Total + scope2Total + scope3Total;
+            const embeddedIntensity = totalEmissions / productionQty;
+
+            // Store results
+            calculationResults = {
+                scope1: scope1Total,
+                scope2: scope2Total,
+                scope3: scope3Total,
+                total: totalEmissions,
+                intensity: embeddedIntensity,
+                cnCode: cnCode,
+                productionQty: productionQty
+            };
+
+            // Update UI
+            document.getElementById('mainResult').textContent = embeddedIntensity.toFixed(3);
+            document.getElementById('scope1Result').textContent = scope1Total.toFixed(2) + ' tCO₂e';
+            document.getElementById('scope2Result').textContent = scope2Total.toFixed(2) + ' tCO₂e';
+            document.getElementById('scope3Result').textContent = scope3Total.toFixed(2) + ' tCO₂e';
+            document.getElementById('totalResult').textContent = totalEmissions.toFixed(2) + ' tCO₂e';
+
+            saveState();
+        }
+
+        // State Persistence
+        function saveState() {
+            const state = {
+                cnCode: document.getElementById('cnCode').value,
+                productionQty: document.getElementById('productionQty').value,
+                electricity: document.getElementById('electricity').value,
+                diesel: document.getElementById('diesel').value,
+                coal: document.getElementById('coal').value,
+                precursorActive: precursorToggle.dataset.active,
+                precursors: []
+            };
+
+            const precursorItems = document.querySelectorAll('#precursorList > div');
+            precursorItems.forEach(item => {
+                state.precursors.push({
+                    type: item.querySelector('.precursor-type').value,
+                    qty: item.querySelector('.precursor-qty').value
+                });
+            });
+
+            localStorage.setItem('cbamCalculatorState', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('cbamCalculatorState');
+            if (!saved) return;
+
+            const state = JSON.parse(saved);
+            document.getElementById('cnCode').value = state.cnCode || '';
+            document.getElementById('productionQty').value = state.productionQty || '';
+            document.getElementById('electricity').value = state.electricity || '';
+            document.getElementById('diesel').value = state.diesel || '';
+            document.getElementById('coal').value = state.coal || '';
+
+            if (state.cnCode) validateCNCode(state.cnCode);
+
+            if (state.precursorActive === 'true') {
+                precursorToggle.click();
+                state.precursors.forEach(p => {
+                    addPrecursorBtn.click();
+                    const lastItem = precursorList.lastElementChild;
+                    lastItem.querySelector('.precursor-type').value = p.type;
+                    lastItem.querySelector('.precursor-qty').value = p.qty;
+                });
+            }
+        }
+
+        // PDF Generation
+        const downloadPDFBtn = document.getElementById('downloadPDFBtn');
+        downloadPDFBtn.addEventListener('click', generatePDF);
+
+        function generatePDF() {
+            if (!calculationResults) {
+                alert('Please calculate emissions first');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Header
+            doc.setFontSize(20);
+            doc.setFont(undefined, 'bold');
+            doc.text('CBAM COMPLIANCE CERTIFICATE', 105, 20, { align: 'center' });
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('ISO 14067 + CBAM Annex III Methodology', 105, 28, { align: 'center' });
+
+            // Certificate Details
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Certificate Details', 20, 45);
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            const certId = 'CBAM-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            const currentDate = new Date().toLocaleDateString('en-GB');
+            
+            doc.text(`Certificate ID: ${certId}`, 20, 55);
+            doc.text(`Issue Date: ${currentDate}`, 20, 62);
+            doc.text(`Valid Until: 31 March 2026`, 20, 69);
+            doc.text(`CN Code: ${calculationResults.cnCode}`, 20, 76);
+
+            // Main Result
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(16, 185, 129);
+            doc.text(`Embedded Intensity: ${calculationResults.intensity.toFixed(3)} tCO₂e/tonne`, 20, 90);
+            doc.setTextColor(0, 0, 0);
+
+            // Emissions Breakdown Table
+            doc.autoTable({
+                startY: 100,
+                head: [['Emission Scope', 'Value (tCO₂e)']],
+                body: [
+                    ['Scope 1 (Direct Fuel)', calculationResults.scope1.toFixed(2)],
+                    ['Scope 2 (Electricity)', calculationResults.scope2.toFixed(2)],
+                    ['Scope 3 (Precursors)', calculationResults.scope3.toFixed(2)],
+                    ['Total Emissions', calculationResults.total.toFixed(2)]
+                ],
+                theme: 'striped',
+                headStyles: { fillColor: [16, 185, 129] },
+                styles: { fontSize: 10 }
+            });
+
+            // Methodology
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text('Methodology:', 20, finalY);
+            doc.setFont(undefined, 'normal');
+            doc.text('Grid Factor: 0.715 tCO₂e/MWh (India CEA 2026)', 20, finalY + 7);
+            doc.text('Diesel Factor: 3.16 tCO₂e/1000L', 20, finalY + 14);
+            doc.text('Coal Factor: 2.5 tCO₂e/1000kg', 20, finalY + 21);
+
+            // QR Code
+            const qrContainer = document.createElement('div');
+            qrContainer.id = 'qr-temp';
+            document.body.appendChild(qrContainer);
+            
+            const qrcode = new QRCode(qrContainer, {
+                text: `https://hindtrade.io/verify/${certId}`,
+                width: 80,
+                height: 80
+            });
+
+            setTimeout(() => {
+                const qrImage = qrContainer.querySelector('img');
+                if (qrImage) {
+                    doc.addImage(qrImage.src, 'PNG', 160, finalY, 30, 30);
+                    doc.setFontSize(8);
+                    doc.text('Scan to Verify', 167, finalY + 35);
+                }
+                document.body.removeChild(qrContainer);
+
+                // Footer
+                doc.setFontSize(8);
+                doc.setTextColor(100, 100, 100);
+                doc.text('Generated by HindTrade Comply • https://hindtrade.io', 105, 280, { align: 'center' });
+
+                // Save
+                doc.save(`CBAM-Certificate-${certId}.pdf`);
+            }, 500);
+        }
+
+        // XML Export
+        const downloadXMLBtn = document.getElementById('downloadXMLBtn');
+        downloadXMLBtn.addEventListener('click', generateXML);
+
+        function generateXML() {
+            if (!calculationResults) {
+                alert('Please calculate emissions first');
+                return;
+            }
+
+            const certId = 'CBAM-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            const currentDate = new Date().toISOString();
+
+            const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<CBAMReport xmlns="urn:cbam:compliance:2026">
+    <Certificate>
+        <ID>${certId}</ID>
+        <IssueDate>${currentDate}</IssueDate>
+        <ValidUntil>2026-03-31T23:59:59Z</ValidUntil>
+        <CNCode>${calculationResults.cnCode}</CNCode>
+    </Certificate>
+    <EmbeddedEmissions>
+        <TotalIntensity unit="tCO2e/tonne">${calculationResults.intensity.toFixed(3)}</TotalIntensity>
+        <Scope1 unit="tCO2e">${calculationResults.scope1.toFixed(2)}</Scope1>
+        <Scope2 unit="tCO2e">${calculationResults.scope2.toFixed(2)}</Scope2>
+        <Scope3 unit="tCO2e">${calculationResults.scope3.toFixed(2)}</Scope3>
+        <TotalEmissions unit="tCO2e">${calculationResults.total.toFixed(2)}</TotalEmissions>
+    </EmbeddedEmissions>
+    <Methodology>
+        <Standard>ISO 14067 + CBAM Annex III</Standard>
+        <GridFactor>0.715</GridFactor>
+        <Country>India</Country>
+    </Methodology>
+    <Production>
+        <Quantity unit="tonnes">${calculationResults.productionQty}</Quantity>
+    </Production>
+</CBAMReport>`;
+
+            const blob = new Blob([xml], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `CBAM-Report-${certId}.xml`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Auto-save on input changes
+        ['productionQty', 'electricity', 'diesel', 'coal'].forEach(id => {
+            document.getElementById(id).addEventListener('input', saveState);
         });
     </script>
 </body>
