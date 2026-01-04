@@ -1,0 +1,45 @@
+/* HindTrade Comply - Custom Styles */
+
+body { 
+    background-color: #050505; 
+    color: #E5E5E5;
+    -webkit-font-smoothing: antialiased;
+}
+
+.hero-mesh {
+    background-image:
+        radial-gradient(at 50% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(255, 255, 255, 0.03) 0px, transparent 50%);
+}
+
+/* --- SPOTLIGHT EFFECT CSS --- */
+.spotlight-card {
+    position: relative;
+    overflow: hidden;
+    /* Keeps the original background colors but allows the glow overlay */
+}
+
+.spotlight-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(
+        800px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
+        rgba(255, 255, 255, 0.06),
+        transparent 40%
+    );
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.spotlight-card:hover::before {
+    opacity: 1;
+}
+
+/* Ensure content sits above the glow */
+.spotlight-card > * {
+    position: relative;
+    z-index: 2;
+}
